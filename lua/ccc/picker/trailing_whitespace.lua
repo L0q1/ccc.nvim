@@ -59,9 +59,18 @@ function TrailingWhitespacePicker.new(opts)
     filter = filter,
   }, TrailingWhitespacePicker)
 
-  vim.api.nvim_create_autocmd("InsertLeave", {
-    callback = function(ev)
-      require("ccc.highlighter"):update(ev.buf, 0, -1)
+  vim.api.nvim_set_hl(0, "TrailingWhitespace", { bg = ft2color[vim.bo.filetype] })
+  vim.api.nvim_create_autocmd({"InsertLeave", "BufEnter"}, {
+    group = vim.api.nvim_create_augroup("hl_trailing", { clear = true }),
+    callback = function()
+      vim.cmd([[match TrailingWhitespace /\s\+$/]])
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("InsertEnter", {
+    group = vim.api.nvim_create_augroup("hl_trailing_del", { clear = true }),
+    callback = function()
+      vim.cmd([[match none]])
     end,
   })
 
